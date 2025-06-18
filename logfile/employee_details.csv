@@ -1,0 +1,4 @@
+id,email,password,name,department,createdAt,updatedAt
+2582f428-2e8e-453f-8e83-15f430d2dfcc,john@sandlogic.com,$2b$10$5qvgzOLSR53MU.w9Ij4FtOCqvnCsFS74Arl4YuFzvoiE4dABKleO.,John Doe,Engineering,2025-06-18 22:07:46.554194,2025-06-18 22:07:46.554194
+98b77c16-ae0c-47b9-af4b-08f6155e6fa0,chirag@sandlogic.com,$2b$10$EXYVGjwTPotm3bLSBm0VOu6gbaeGKMAbGNRs6XQbHZ2ImGBaQ6RBu,Chirag Shukla,Engineering,2025-06-18 23:28:01.856211,2025-06-18 23:28:01.856211
+7a88c532-5ec3-4a6b-9a5a-e32e5fddb8cf,anushka@sandlogic.com,$2b$10$389qqPZT1dwQBawl3Yhg7ODo/XWtF8bJtvNfbaIDI/A3ftkoomIhe,Anushka Sharma,Engineering,2025-06-19 01:07:04.08776,2025-06-19 01:07:04.08776
