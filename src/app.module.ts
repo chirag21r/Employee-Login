@@ -5,11 +5,22 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
 import { LogsModule } from './logs/logs.module';
 
-import { User } from './user/user.entity';
+// ✅ New Modules (to be created)
+import { UsersModule } from './users/users.module';
+import { EmployeeProfilesModule } from './employee-profiles/employee-profiles.module';
+import { RolesModule } from './roles/roles.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
+import { SessionsModule } from './sessions/sessions.module';
+
+// ✅ Updated Entities
+import { User } from './users/entities/user.entity';
 import { Log } from './logs/log.entity';
+import { EmployeeProfile } from './employee-profiles/entities/employee-profile.entity';
+import { Role } from './roles/entities/role.entity';
+import { AuditLog } from './audit-logs/entities/audit-log.entity';
+import { UserSession } from './sessions/entities/user-session.entity';
 
 @Module({
   imports: [
@@ -29,14 +40,26 @@ import { Log } from './logs/log.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User, Log],
-        synchronize: true, // set to false in production
+        entities: [
+          User,
+          Log,
+          EmployeeProfile,
+          Role,
+          AuditLog,
+          UserSession,
+        ],
+        synchronize: true, // ❗ Disable in production
       }),
     }),
 
+    // ✅ Feature Modules
     AuthModule,
-    UserModule,
     LogsModule,
+    UsersModule,
+    EmployeeProfilesModule,
+    RolesModule,
+    AuditLogsModule,
+    SessionsModule,
   ],
 })
 export class AppModule {}
