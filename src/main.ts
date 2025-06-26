@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // app.useGlobalGuards(new RolesGuard(new Reflector()));
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   await app.listen(3000);
