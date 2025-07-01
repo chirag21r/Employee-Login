@@ -7,6 +7,8 @@ export declare class UserService {
     constructor(userRepository: Repository<User>, roleRepo: Repository<Role>);
     createUser(user: Partial<User>): Promise<User>;
     findByEmail(email: string): Promise<User | undefined>;
-    findById(id: string): Promise<User | undefined>;
+    findById(id: string, options?: {
+        relations?: string[];
+    }): Promise<User | undefined>;
     updateRoles(userId: string, roleIds: string[]): Promise<User>;
 }

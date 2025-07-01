@@ -20,20 +20,28 @@ const employee_profile_entity_1 = require("./entity/employee-profile.entity");
 const json2csv_1 = require("json2csv");
 const ExcelJS = require("exceljs");
 const audit_logs_service_1 = require("../audit-logs/audit-logs.service");
+const user_entity_1 = require("../user/entity/user.entity");
 let EmployeeProfileService = class EmployeeProfileService {
-    constructor(profileRepo, auditService) {
+    constructor(profileRepo, userRepo, auditService) {
         this.profileRepo = profileRepo;
+        this.userRepo = userRepo;
         this.auditService = auditService;
     }
-    create(data) {
-        const profile = this.profileRepo.create(data);
-        return this.profileRepo.save(profile);
+    async create(data) {
+        const user = await this.userRepo.findOne({ where: { id: data.userId } });
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        const profile = this.profileRepo.create({
+            ...data,
+            user,
+        });
+        return await this.profileRepo.save(profile);
     }
-    findAll() {
-        return this.profileRepo.find({ relations: ['user'] });
+    async findAll() {
+        return await this.profileRepo.find({ relations: ['user'] });
     }
-    findOne(id) {
-        return this.profileRepo.findOne({ where: { id }, relations: ['user'] });
+    async findOne(id) {
+        return await this.profileRepo.findOne({ where: { id }, relations: ['user'] });
     }
     async update(id, dto, meta) {
         const profile = await this.findOne(id);
@@ -72,21 +80,28 @@ let EmployeeProfileService = class EmployeeProfileService {
         return result;
     }
     async exportAsCSV() {
-        const employees = await this.profileRepo.find({ relations: ['user'] });
+        const employees = await this.profileRepo.find({
+            relations: ['user'],
+            where: { deletedAt: (0, typeorm_2.IsNull)() },
+        });
         const data = employees.map(emp => ({
             employeeId: emp.employeeId,
-            name: emp.user?.firstName + ' ' + emp.user?.lastName,
-            department: emp.user?.department,
-            email: emp.user?.email,
+            name: emp.user ? `${emp.user.firstName} ${emp.user.lastName}` : 'N/A',
+            department: emp.user?.department || 'N/A',
+            email: emp.user?.email || 'N/A',
             phone: emp.phone,
             address: emp.address,
             salary: emp.salary,
         }));
+        console.log('📦 Exporting CSV Data:', data);
         const parser = new json2csv_1.Parser();
         return parser.parse(data);
     }
     async exportAsExcel() {
-        const employees = await this.profileRepo.find({ relations: ['user'] });
+        const employees = await this.profileRepo.find({
+            relations: ['user'],
+            where: { deletedAt: (0, typeorm_2.IsNull)() },
+        });
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Employees');
         worksheet.columns = [
@@ -101,9 +116,9 @@ let EmployeeProfileService = class EmployeeProfileService {
         employees.forEach(emp => {
             worksheet.addRow({
                 employeeId: emp.employeeId,
-                name: emp.user?.firstName + ' ' + emp.user?.lastName,
-                department: emp.user?.department,
-                email: emp.user?.email,
+                name: emp.user ? `${emp.user.firstName} ${emp.user.lastName}` : 'N/A',
+                department: emp.user?.department || 'N/A',
+                email: emp.user?.email || 'N/A',
                 phone: emp.phone,
                 address: emp.address,
                 salary: emp.salary,
@@ -117,7 +132,9 @@ exports.EmployeeProfileService = EmployeeProfileService;
 exports.EmployeeProfileService = EmployeeProfileService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(employee_profile_entity_1.EmployeeProfile)),
+    __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         audit_logs_service_1.AuditLogsService])
 ], EmployeeProfileService);
 //# sourceMappingURL=employee-profile.service.js.map

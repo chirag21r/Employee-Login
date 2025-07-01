@@ -80,6 +80,10 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)({ type: 'timestamp' }),
     __metadata("design:type", Date)
 ], EmployeeProfile.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.DeleteDateColumn)({ type: 'timestamp', nullable: true }),
+    __metadata("design:type", Date)
+], EmployeeProfile.prototype, "deletedAt", void 0);
 exports.EmployeeProfile = EmployeeProfile = __decorate([
     (0, typeorm_1.Entity)('employee_profiles')
 ], EmployeeProfile);

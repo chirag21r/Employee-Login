@@ -1,12 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { EmployeeProfile } from './entity/employee-profile.entity';
 import { CreateEmployeeProfileDto } from './dto/create-profile.dto';
 import { UpdateEmployeeProfileDto } from './dto/update-profile.dto';
 import { Parser } from 'json2csv';
 import * as ExcelJS from 'exceljs';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
+import { User } from '../user/entity/user.entity';
 
 @Injectable()
 export class EmployeeProfileService {
@@ -14,22 +18,35 @@ export class EmployeeProfileService {
     @InjectRepository(EmployeeProfile)
     private profileRepo: Repository<EmployeeProfile>,
 
+    @InjectRepository(User)
+    private userRepo: Repository<User>,
+
     private readonly auditService: AuditLogsService,
   ) {}
 
-  create(data: CreateEmployeeProfileDto) {
-    const profile = this.profileRepo.create(data);
-    return this.profileRepo.save(profile);
+  // ✅ CREATE with user relation properly set
+  async create(data: CreateEmployeeProfileDto) {
+    const user = await this.userRepo.findOne({ where: { id: data.userId } });
+    if (!user) throw new NotFoundException('User not found');
+
+    const profile = this.profileRepo.create({
+      ...data,
+      user,
+    });
+    return await this.profileRepo.save(profile);
   }
 
-  findAll() {
-    return this.profileRepo.find({ relations: ['user'] });
+  // ✅ FIND ALL
+  async findAll() {
+    return await this.profileRepo.find({ relations: ['user'] });
   }
 
-  findOne(id: string) {
-    return this.profileRepo.findOne({ where: { id }, relations: ['user'] });
+  // ✅ FIND ONE
+  async findOne(id: string) {
+    return await this.profileRepo.findOne({ where: { id }, relations: ['user'] });
   }
 
+  // ✅ UPDATE with audit log
   async update(
     id: string,
     dto: UpdateEmployeeProfileDto,
@@ -56,6 +73,7 @@ export class EmployeeProfileService {
     return saved;
   }
 
+  // ✅ SOFT DELETE
   async remove(
     id: string,
     meta: { userId: string; ip: string; userAgent: string },
@@ -79,29 +97,36 @@ export class EmployeeProfileService {
     return result;
   }
 
+  // ✅ EXPORT AS CSV
   async exportAsCSV(): Promise<string> {
-    const employees = await this.profileRepo.find({ relations: ['user'] });
-  
+    const employees = await this.profileRepo.find({
+       relations: ['user'],
+       where: {deletedAt: IsNull()},
+     });
+
     const data = employees.map(emp => ({
       employeeId: emp.employeeId,
-      name: emp.user?.firstName + ' ' + emp.user?.lastName,
-      department: emp.user?.department,
-      email: emp.user?.email,
+      name: emp.user ? `${emp.user.firstName} ${emp.user.lastName}` : 'N/A',
+      department: emp.user?.department || 'N/A',
+      email: emp.user?.email || 'N/A',
       phone: emp.phone,
       address: emp.address,
       salary: emp.salary,
     }));
-  
+    console.log('📦 Exporting CSV Data:', data); // 🔍 DEBUG LOG
     const parser = new Parser();
     return parser.parse(data);
   }
-  
+
+  // ✅ EXPORT AS EXCEL
   async exportAsExcel(): Promise<Buffer> {
-    const employees = await this.profileRepo.find({ relations: ['user'] });
-  
+    const employees = await this.profileRepo.find({
+      relations: ['user'],
+      where: { deletedAt: IsNull() }, // ✅ same here
+    });
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Employees');
-  
+
     worksheet.columns = [
       { header: 'Employee ID', key: 'employeeId', width: 15 },
       { header: 'Name', key: 'name', width: 25 },
@@ -111,21 +136,20 @@ export class EmployeeProfileService {
       { header: 'Address', key: 'address', width: 30 },
       { header: 'Salary', key: 'salary', width: 15 },
     ];
-  
+
     employees.forEach(emp => {
       worksheet.addRow({
         employeeId: emp.employeeId,
-        name: emp.user?.firstName + ' ' + emp.user?.lastName,
-        department: emp.user?.department,
-        email: emp.user?.email,
+        name: emp.user ? `${emp.user.firstName} ${emp.user.lastName}` : 'N/A',
+        department: emp.user?.department || 'N/A',
+        email: emp.user?.email || 'N/A',
         phone: emp.phone,
         address: emp.address,
         salary: emp.salary,
       });
     });
-  
+
     const buffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(buffer);
   }
-
 }

@@ -7,5 +7,8 @@ export declare class UserController {
     private readonly logsService;
     constructor(userService: UserService, logsService: LogsService);
     signup(body: CreateUserDto): Promise<import("./entity/user.entity").User>;
+    testEndpoint(): {
+        message: string;
+    };
     updateUserRoles(userId: string, dto: AssignRolesDto): Promise<import("./entity/user.entity").User>;
 }

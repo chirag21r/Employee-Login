@@ -16,4 +16,5 @@ export declare class EmployeeProfile {
     certifications?: object;
     createdAt: Date;
     updatedAt: Date;
+    deletedAt?: Date;
 }

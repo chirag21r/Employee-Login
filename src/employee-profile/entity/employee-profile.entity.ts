@@ -1,6 +1,12 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
-  OneToOne, JoinColumn
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../../user/entity/user.entity';
 
@@ -54,4 +60,8 @@ export class EmployeeProfile {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt!: Date;
+
+  // ✅ Added this for soft delete support
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deletedAt?: Date;
 }

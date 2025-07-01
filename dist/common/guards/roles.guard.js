@@ -17,7 +17,7 @@ let RolesGuard = class RolesGuard {
     constructor(reflector) {
         this.reflector = reflector;
     }
-    async canActivate(context) {
+    canActivate(context) {
         const requiredRoles = this.reflector.getAllAndOverride(roles_decorator_1.ROLES_KEY, [
             context.getHandler(),
             context.getClass(),
@@ -27,7 +27,9 @@ let RolesGuard = class RolesGuard {
         }
         const request = context.switchToHttp().getRequest();
         const user = request.user;
-        const userRoles = user.roles?.map(role => role.name) || [];
+        const userRoles = Array.isArray(user?.roles) ? user.roles : [];
+        console.log('🔐 Incoming user roles:', userRoles);
+        console.log('🔒 Required roles:', requiredRoles);
         const hasRole = requiredRoles.some(role => userRoles.includes(role));
         if (!hasRole) {
             throw new common_1.ForbiddenException('You do not have permission to access this resource');

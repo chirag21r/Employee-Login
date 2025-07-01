@@ -5,7 +5,7 @@ export declare class AuthController {
     constructor(authService: AuthService);
     login(req: Request): Promise<{
         access_token: string;
-        user: any;
+        user: import("../user/entity/user.entity").User | undefined;
     }>;
     getProfile(req: any): any;
 }

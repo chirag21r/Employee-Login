@@ -36,9 +36,12 @@ let UserService = class UserService {
         const user = await this.userRepository.findOne({ where: { email } });
         return user === null ? undefined : user;
     }
-    async findById(id) {
-        const user = await this.userRepository.findOne({ where: { id } });
-        return user === null ? undefined : user;
+    async findById(id, options = {}) {
+        const user = await this.userRepository.findOne({
+            where: { id },
+            ...options,
+        });
+        return user ?? undefined;
     }
     async updateRoles(userId, roleIds) {
         const user = await this.userRepository.findOne({

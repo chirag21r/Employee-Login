@@ -1,6 +1,7 @@
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { LogsService } from '../logs/log.service';
+import { User } from 'src/user/entity/user.entity';
 export declare class AuthService {
     private readonly userService;
     private readonly jwtService;
@@ -14,7 +15,7 @@ export declare class AuthService {
         displayName: string;
         jobTitle: string;
         department: string;
-        manager?: import("../user/entity/user.entity").User;
+        manager?: User;
         isActive: boolean;
         lastLogin?: Date;
         createdAt: Date;
@@ -24,6 +25,6 @@ export declare class AuthService {
     }>;
     login(user: any, ip: string, userAgent: string): Promise<{
         access_token: string;
-        user: any;
+        user: User | undefined;
     }>;
 }

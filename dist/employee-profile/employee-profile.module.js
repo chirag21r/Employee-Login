@@ -13,13 +13,14 @@ const audit_logs_module_1 = require("../audit-logs/audit-logs.module");
 const employee_profile_entity_1 = require("./entity/employee-profile.entity");
 const employee_profile_service_1 = require("./employee-profile.service");
 const employee_profile_controller_1 = require("./employee-profile.controller");
+const user_entity_1 = require("../user/entity/user.entity");
 let EmployeeProfilesModule = class EmployeeProfilesModule {
 };
 exports.EmployeeProfilesModule = EmployeeProfilesModule;
 exports.EmployeeProfilesModule = EmployeeProfilesModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forFeature([employee_profile_entity_1.EmployeeProfile]),
+            typeorm_1.TypeOrmModule.forFeature([employee_profile_entity_1.EmployeeProfile, user_entity_1.User]),
             audit_logs_module_1.AuditLogsModule,
         ],
         providers: [employee_profile_service_1.EmployeeProfileService],

@@ -38,16 +38,23 @@ let AuthService = class AuthService {
         return safeUser;
     }
     async login(user, ip, userAgent) {
-        const payload = { sub: user.id, email: user.email };
+        const fullUser = await this.userService.findById(user.id, {
+            relations: ['roles'],
+        });
+        const payload = {
+            sub: fullUser?.id,
+            email: fullUser?.email,
+            roles: fullUser?.roles.map((r) => r.name),
+        };
         await this.logsService.createLog({
-            employeeId: user.id,
+            employeeId: fullUser?.id,
             action: log_entity_1.LogAction.LOGIN,
             ipAddress: ip || 'N/A',
             userAgent: userAgent || 'N/A',
         });
         return {
             access_token: this.jwtService.sign(payload),
-            user,
+            user: fullUser,
         };
     }
 };

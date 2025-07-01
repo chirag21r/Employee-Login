@@ -1,187 +1,157 @@
-# 🚀 Employee Authentication & Logging System for SandLogic
+# 👥 Employee Management & Authorization System
 
-A **secure, production-ready employee login system** developed using **NestJS, PostgreSQL, JWT**, and **Rclone-based Google Drive backup**, tailored specifically for **SandLogic**’s infrastructure and security policies.
+A robust, secure, and extensible employee management backend system built with **NestJS**, **TypeORM**, and **PostgreSQL**, featuring:
 
----
-
-## 📌 Overview
-
-This system enables:
-
-- **Secure employee signup/login** using company emails (`@sandlogic.com`)
-- **Domain-restricted access** to ensure only authorized personnel can register
-- **User activity logging** stored and backed up regularly
-- **Automated backups** of user logs to **Google Drive**
-- **Daily log cleanup** to keep database lightweight
-- Full JWT-based **session management**
-- Cron-based **scheduled backups**
+- 🔐 Role-Based Access Control (RBAC)
+- 📄 Audit Logs for tracking changes
+- 📤 CSV/Excel export of employee data
+- 📚 Clean architecture and modular design
 
 ---
 
-## 🔐 Features
+## 🚀 Project Overview
 
-| Feature                | Description                                               |
-| ---------------------- | --------------------------------------------------------- |
-| **Signup/Login**       | Email-password auth using company domain validation       |
-| **JWT Authentication** | Secure access tokens with expiration                      |
-| **Logging System**     | Tracks SIGNUP, LOGIN, and CHECKOUT actions                |
-| **PostgreSQL**         | User & logs stored in `employee_auth_db`                  |
-| **Auto Export & Sync** | Daily export of tables to `.csv` and sync to Google Drive |
-| **Log Cleanup**        | Automatically deletes log entries older than 7 days       |
-| **Cron Scheduling**    | Backup and cleanup tasks run daily                        |
+This system handles employee records, roles, and access control in an organization securely. Users authenticate via email & password and are assigned one or more roles, which determine their permissions across the system.
+
+### 🔧 Tech Stack
+- **Backend:** NestJS + TypeORM
+- **Database:** PostgreSQL
+- **Security:** JWT Authentication + RBAC
+- **Exports:** JSON2CSV + ExcelJS
+- **Validation:** Class-validator + DTOs
 
 ---
 
-## 📊 System Architecture
+## 🧠 System Architecture
 
-```
-                 ┌─────────────────────────────┐
-                 │        Client (Postman)     │
-                 │ ─ POST /signup              │
-                 │ ─ POST /auth/login          │
-                 │ ─ GET  /auth/profile        │
-                 └────────────┬────────────────┘
-                              │
-                              ▼
-                  ┌────────────────────┐
-                  │   NestJS Backend   │
-                  ├────────────────────┤
-                  │ AuthController     │
-                  │ UserController     │
-                  │ LogsController     │
-                  └────┬──────┬────────┘
-                       │      │
-         ┌─────────────┘      └──────────────┐
-         ▼                                    ▼
-┌────────────────────┐             ┌────────────────────┐
-│  employee_details  │             │   employee_logs     │
-│ (PostgreSQL Table) │             │ (PostgreSQL Table) │
-└────────┬───────────┘             └─────────┬──────────┘
-         │                                     │
-         ▼                                     ▼
-  🔄 Cron Scheduler                     🔄 Cron Scheduler
-  │ - Log Cleanup                      │ - Backup Trigger
-  │ - Daily Export                     │ - Rclone Sync
-  ▼                                     ▼
-./export_db.sh                    Google Drive (rclone)
- - CSV Export from DB              ─ logs/
- - Stored in ./logfile/              ├ employee_details.csv
-                                     └ employee_logs.csv
+```mermaid
+graph TD
+  A[User] -->|Login| B(Auth Module)
+  B --> C{JWT Token}
+  A -->|API Request + Token| D[Guards + Interceptors]
+  D -->|Check Role| E[Employee Profile Module]
+  D -->|Log Action| F[Audit Log Module]
+  D -->|Assign Role| G[User Module]
+  E --> H[(PostgreSQL Database)]
+  F --> H
+  G --> H
 ```
 
 ---
 
-## 🧪 API Endpoints (Testable via Postman)
+## 🧾 Key Features
 
-| Method | Endpoint        | Description                                    |
-| ------ | --------------- | ---------------------------------------------- |
-| POST   | `/user/signup`  | Register user with email, password, department |
-| POST   | `/auth/login`   | Authenticate and receive JWT token             |
-| GET    | `/auth/profile` | View user info (JWT-protected)                 |
-
-### ✅ Sample Signup Request
-
-```json
-POST /user/signup
-{
-  "email": "anushka@sandlogic.com",
-  "password": "1234",
-  "name": "Anushka Sharma",
-  "department": "Engineering"
-}
-```
-
-### 🔐 Sample JWT Response
-
-```json
-{
-  "access_token": "<token>",
-  "user": {
-    "id": "...",
-    "email": "anushka@sandlogic.com",
-    ...
-  }
-}
-```
-
-### 🧾 Profile (with Bearer Token)
-
-```http
-GET /auth/profile
-Authorization: Bearer <access_token>
-```
+- ✅ **Authentication:** JWT-based login
+- ✅ **User Signup with Validation**
+- ✅ **RBAC:** Super Admin, HR Admin, Manager, Employee
+- ✅ **Audit Logs:** Update/Delete tracking with metadata
+- ✅ **Data Export:** Employee data as CSV or Excel
+- ✅ **Soft Deletion** of profiles
+- ✅ **Clean Modular Design**
 
 ---
 
-## 🛠 How It Works
+## 👥 Roles & Permissions
 
-### ✅ Signup Flow
-
-1. User provides email/password via `/user/signup`
-2. System checks:
-   - Is the domain `@sandlogic.com`?
-   - Is the email already registered?
-3. Password is hashed and saved in `employee_details`
-4. Signup log is saved in `employee_logs`
-
-### ✅ Login Flow
-
-1. User logs in via `/auth/login`
-2. Password is verified
-3. JWT token is returned
-4. Login action is logged in `employee_logs`
-
-### ✅ Logging Structure
-
-Each action (`SIGNUP`, `LOGIN`, `CHECKOUT`) is recorded with:
-
-- Employee ID
-- Action
-- Timestamp
-- IP address and User Agent *(currently placeholders)*
+| Feature / Endpoint                  | SUPER_ADMIN | HR_ADMIN | MANAGER | EMPLOYEE |
+|------------------------------------|-------------|----------|---------|----------|
+| User Signup                         | ✅          | ✅       | ✅      | ✅       |
+| Assign Roles                        | ✅          | ❌       | ❌      | ❌       |
+| Create Employee Profile             | ✅          | ✅       | ❌      | ❌       |
+| View All Employee Profiles          | ✅          | ✅       | ❌      | ❌       |
+| View Single Employee Profile        | ✅          | ✅       | ✅      | ✅       |
+| Update Employee Profile             | ✅          | ✅       | ❌      | ❌       |
+| Delete Employee Profile             | ✅          | ❌       | ❌      | ❌       |
+| Export as CSV/Excel                 | ✅          | ✅       | ❌      | ❌       |
+| View Audit Logs                     | ✅          | ❌       | ❌      | ❌       |
 
 ---
 
-## 📁 Backup Strategy
+## 🔐 Authentication API
 
-### 🔃 `export_db.sh`
-
-- Converts both tables into `.csv` using `psql \COPY`
-- Saves them inside `./logfile/` directory
-
-### 📤 Rclone Integration
-
-- CSV files are synced to **Google Drive** folder using:
-
-```bash
-rclone sync ./logfile/ gdrive-remote:backup
-```
+| Method | Endpoint            | Description               | Auth | Role |
+|--------|---------------------|---------------------------|------|------|
+| POST   | `/auth/login`       | Login & get JWT token     | ❌   | —    |
 
 ---
 
-## ⏱️ Scheduler System
+## 👤 User API
 
-Scheduled via `@nestjs/schedule`, two tasks run daily:
-
-| Task        | Time     | Description                                |
-| ----------- | -------- | ------------------------------------------ |
-| Log Cleanup | Midnight | Removes logs older than 7 days             |
-| Backup Sync | Midnight | Exports tables → syncs to Drive via Rclone |
-
-> During development, it was tested with 1-minute intervals.
-
-
-## ✅ Technologies Used
-
-- **NestJS** (Express under the hood)
-- **TypeORM**
-- **PostgreSQL**
-- **JWT (jsonwebtoken)**
-- **Bcrypt for hashing**
-- **Rclone for Google Drive sync**
-- **Shell scripting**
-- **Cron jobs (**``**)**
+| Method | Endpoint              | Description                  | Auth | Role          |
+|--------|-----------------------|------------------------------|------|---------------|
+| POST   | `/user/signup`        | Register a user              | ❌   | —             |
+| PUT    | `/user/:id/roles`     | Assign roles to user         | ✅   | SUPER_ADMIN   |
 
 ---
 
+## 🧑‍💼 Employee API
 
+| Method | Endpoint                       | Description                        | Auth | Role                          |
+|--------|--------------------------------|------------------------------------|------|-------------------------------|
+| POST   | `/api/employees`              | Create employee profile            | ✅   | SUPER_ADMIN, HR_ADMIN         |
+| GET    | `/api/employees`              | List all employee profiles         | ✅   | SUPER_ADMIN, HR_ADMIN         |
+| GET    | `/api/employees/:id`          | Get profile by ID                  | ✅   | SUPER_ADMIN, HR_ADMIN, EMPLOYEE |
+| PUT    | `/api/employees/:id`          | Update employee profile            | ✅   | SUPER_ADMIN, HR_ADMIN         |
+| DELETE | `/api/employees/:id`          | Soft delete profile                | ✅   | SUPER_ADMIN                   |
+
+---
+
+## 📤 Export API
+
+| Method | Endpoint                           | Description                    | Auth | Role                    |
+|--------|------------------------------------|--------------------------------|------|--------------------------|
+| GET    | `/api/employees/export/csv`        | Export employees to CSV        | ✅   | SUPER_ADMIN, HR_ADMIN   |
+| GET    | `/api/employees/export/excel`      | Export employees to Excel      | ✅   | SUPER_ADMIN, HR_ADMIN   |
+
+---
+
+## 📚 Audit Logs API
+
+| Method | Endpoint               | Description                | Auth | Role        |
+|--------|------------------------|----------------------------|------|-------------|
+| GET    | `/api/audit-logs`      | View system change logs    | ✅   | SUPER_ADMIN |
+
+---
+
+## 📦 How This System Is Useful
+
+- ✅ **For Organizations:** Helps manage employees, track access, and ensure secure operations.
+- ✅ **For Admins:** Full control over users and changes via audit logs.
+- ✅ **For Developers:** Modular, scalable NestJS backend ready for integration.
+- ✅ **Compliance:** Supports auditability and traceability for sensitive data.
+
+---
+
+## ✅ Getting Started
+
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Setup PostgreSQL & .env**
+   ```env
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_USERNAME=postgres
+   DB_PASSWORD=your_password
+   DB_NAME=employee_auth_db
+   JWT_SECRET=supersecretkey
+   JWT_EXPIRES_IN=1h
+   ```
+
+3. **Run App**
+   ```bash
+   npm run start:dev
+   ```
+
+4. **Seed Roles (Optional)**
+   ```bash
+   ts-node src/roles/role.seed.ts
+   ```
+
+---
+
+## 📧 Contact
+
+> Made with ❤️ by [Chirag Shukla] during Internship at Sandlogic, 2025.

@@ -28,10 +28,13 @@ export class UserService {
     return user === null ? undefined : user;
   }
 
-  async findById(id: string): Promise<User | undefined> {
-    const user = await this.userRepository.findOne({ where: { id } });
-    return user === null ? undefined : user;
-  }
+  async findById(id: string, options: { relations?: string[] } = {}): Promise<User | undefined> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      ...options,
+    });
+    return user ?? undefined;
+  }  
 
   async updateRoles(userId: string, roleIds: string[]) {
     const user = await this.userRepository.findOne({

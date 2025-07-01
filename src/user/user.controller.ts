@@ -7,6 +7,7 @@ import {
   Put,
   UseGuards,
   Param,
+  Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { LogsService } from '../logs/log.service';
@@ -51,9 +52,16 @@ export class UserController {
 
     return user;
   }
-  @Put(':id/roles')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.SUPER_ADMIN)
+@Get('test')
+testEndpoint() {
+  return { message: 'Super Admin access granted' };
+}
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.SUPER_ADMIN)
+  @Put(':id/roles')
   async updateUserRoles(
     @Param('id') userId: string,
     @Body() dto: AssignRolesDto
