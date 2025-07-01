@@ -29,4 +29,20 @@ export class UserService {
     const user = await this.userRepository.findOne({ where: { id } });
     return user === null ? undefined : user;
   }
+
+  async updateRoles(userId: string, roleIds: string[]) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['roles'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const roles = await this.roleRepo.findByIds(roleIds);
+    user.roles = roles;
+
+    return this.userRepository.save(user);
+  }
 }

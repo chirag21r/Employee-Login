@@ -9,6 +9,11 @@ import { UserService } from './user.service';
 import { LogsService } from '../logs/log.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LogAction } from '../logs/log.entity';
+import { AssignRolesDto } from './dto/assign-roles.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UserRole } from 'src/common/constants/roles.enum';
 
 @Controller('user')
 export class UserController {
@@ -42,5 +47,14 @@ export class UserController {
     });
 
     return user;
+  }
+  @Put(':id/roles')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
+  async updateUserRoles(
+    @Param('id') userId: string,
+    @Body() dto: AssignRolesDto
+  ) {
+    return this.userService.updateRoles(userId, dto.roleIds);
   }
 }
