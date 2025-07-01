@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Res,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { EmployeeProfileService } from './employee-profile.service';
@@ -17,6 +18,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../common/constants/roles.enum';
+import { Response } from 'express';
+import { Res } from '@nestjs/common';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('api/employees')
@@ -40,6 +43,24 @@ export class EmployeeProfileController {
   findOne(@Param('id') id: string) {
     return this.service.findOne(id);
   }
+
+  @Get('export/csv')
+@Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)
+async exportCSV(@Res() res: Response) {
+  const csv = await this.service.exportAsCSV();
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHea der('Content-Disposition', 'attachment; filename=employee_data.csv');
+  res.send(csv);
+}
+
+@Get('export/excel')
+@Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)
+async exportExcel(@Res() res: Response) {
+  const buffer = await this.service.exportAsExcel();
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', 'attachment; filename=employee_data.xlsx');
+  res.send(buffer);
+}
 
   @Put(':id')
   @Roles(UserRole.SUPER_ADMIN, UserRole.HR_ADMIN)

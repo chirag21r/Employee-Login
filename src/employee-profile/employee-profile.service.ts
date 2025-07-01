@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { EmployeeProfile } from './entity/employee-profile.entity';
 import { CreateEmployeeProfileDto } from './dto/create-profile.dto';
 import { UpdateEmployeeProfileDto } from './dto/update-profile.dto';
+import { Parser } from 'json2csv';
+import * as ExcelJS from 'exceljs';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 @Injectable()
@@ -75,4 +77,54 @@ export class EmployeeProfileService {
 
     return result;
   }
+
+  async exportAsCSV(): Promise<string> {
+    const employees = await this.profileRepo.find({ relations: ['user'] });
+  
+    const data = employees.map(emp => ({
+      employeeId: emp.employeeId,
+      name: emp.user?.firstName + ' ' + emp.user?.lastName,
+      department: emp.user?.department,
+      email: emp.user?.email,
+      phone: emp.phone,
+      address: emp.address,
+      salary: emp.salary,
+    }));
+  
+    const parser = new Parser();
+    return parser.parse(data);
+  }
+  
+  async exportAsExcel(): Promise<Buffer> {
+    const employees = await this.profileRepo.find({ relations: ['user'] });
+  
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Employees');
+  
+    worksheet.columns = [
+      { header: 'Employee ID', key: 'employeeId', width: 15 },
+      { header: 'Name', key: 'name', width: 25 },
+      { header: 'Department', key: 'department', width: 20 },
+      { header: 'Email', key: 'email', width: 30 },
+      { header: 'Phone', key: 'phone', width: 15 },
+      { header: 'Address', key: 'address', width: 30 },
+      { header: 'Salary', key: 'salary', width: 15 },
+    ];
+  
+    employees.forEach(emp => {
+      worksheet.addRow({
+        employeeId: emp.employeeId,
+        name: emp.user?.firstName + ' ' + emp.user?.lastName,
+        department: emp.user?.department,
+        email: emp.user?.email,
+        phone: emp.phone,
+        address: emp.address,
+        salary: emp.salary,
+      });
+    });
+  
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
+  }
+  
 }
