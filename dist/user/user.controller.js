@@ -59,10 +59,10 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "signup", null);
 __decorate([
-    Put(':id/roles'),
-    UseGuards(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Put)(':id/roles'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(roles_enum_1.UserRole.SUPER_ADMIN),
-    __param(0, Param('id')),
+    __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, assign_roles_dto_1.AssignRolesDto]),

@@ -1,4 +1,3 @@
-// ---------- src/user/dto/create-user.dto.ts ----------
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateUserDto {
@@ -10,7 +9,10 @@ export class CreateUserDto {
   password!: string;
 
   @IsString()
-  name!: string;
+  firstName!: string;
+
+  @IsString()
+  lastName!: string;
 
   @IsString()
   department!: string;

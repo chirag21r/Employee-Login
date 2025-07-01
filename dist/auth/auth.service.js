@@ -23,14 +23,19 @@ let AuthService = class AuthService {
         this.logsService = logsService;
     }
     async validateUser(email, password) {
-        const user = await this.userService.findByEmail(email);
         if (!email.endsWith('@sandlogic.com')) {
             throw new common_1.UnauthorizedException('Only sandlogic.com email addresses are allowed');
         }
-        if (user && await bcrypt.compare(password, user.password)) {
-            return user;
+        const user = await this.userService.findByEmail(email);
+        if (!user) {
+            throw new common_1.UnauthorizedException('Invalid credentials');
         }
-        throw new common_1.UnauthorizedException('Invalid credentials');
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            throw new common_1.UnauthorizedException('Invalid credentials');
+        }
+        const { password: _, ...safeUser } = user;
+        return safeUser;
     }
     async login(user, ip, userAgent) {
         const payload = { sub: user.id, email: user.email };

@@ -65,6 +65,7 @@ let EmployeeProfileService = class EmployeeProfileService {
             resourceType: 'EmployeeProfile',
             resourceId: id,
             oldValues: profile,
+            newValues: profile,
             ipAddress: meta.ip,
             userAgent: meta.userAgent,
         });
@@ -109,7 +110,7 @@ let EmployeeProfileService = class EmployeeProfileService {
             });
         });
         const buffer = await workbook.xlsx.writeBuffer();
-        return buffer;
+        return Buffer.from(buffer);
     }
 };
 exports.EmployeeProfileService = EmployeeProfileService;

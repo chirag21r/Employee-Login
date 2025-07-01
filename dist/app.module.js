@@ -15,7 +15,7 @@ const auth_module_1 = require("./auth/auth.module");
 const logs_module_1 = require("./logs/logs.module");
 const user_module_1 = require("./user/user.module");
 const employee_profile_module_1 = require("./employee-profile/employee-profile.module");
-const roles_module_1 = require("./roles/roles.module");
+const role_module_1 = require("./roles/role.module");
 const audit_logs_module_1 = require("./audit-logs/audit-logs.module");
 const sessions_module_1 = require("./sessions/sessions.module");
 const user_entity_1 = require("./user/entity/user.entity");
@@ -57,7 +57,7 @@ exports.AppModule = AppModule = __decorate([
             logs_module_1.LogsModule,
             user_module_1.UsersModule,
             employee_profile_module_1.EmployeeProfilesModule,
-            roles_module_1.RolesModule,
+            role_module_1.RolesModule,
             audit_logs_module_1.AuditLogsModule,
             sessions_module_1.SessionsModule,
         ],

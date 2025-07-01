@@ -34,7 +34,7 @@ exports.AuthModule = AuthModule = __decorate([
                 }),
                 inject: [config_1.ConfigService],
             }),
-            user_module_1.UserModule,
+            user_module_1.UsersModule,
             logs_module_1.LogsModule,
         ],
         providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],

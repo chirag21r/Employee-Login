@@ -14,14 +14,26 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string) {
-    const user = await this.userService.findByEmail(email);
+    // Step 1: Check domain early
     if (!email.endsWith('@sandlogic.com')) {
       throw new UnauthorizedException('Only sandlogic.com email addresses are allowed');
     }
-    if (user && await bcrypt.compare(password, user.password)) {
-      return user;
+  
+    // Step 2: Find user
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
     }
-    throw new UnauthorizedException('Invalid credentials');
+  
+    // Step 3: Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+  
+    // Step 4: Return safe user + token
+    const { password: _, ...safeUser } = user;
+    return safeUser;
   }
 
   async login(user: any, ip: string, userAgent: string) {

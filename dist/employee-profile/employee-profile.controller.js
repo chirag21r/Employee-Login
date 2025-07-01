@@ -37,8 +37,7 @@ let EmployeeProfileController = class EmployeeProfileController {
     async exportCSV(res) {
         const csv = await this.service.exportAsCSV();
         res.setHeader('Content-Type', 'text/csv');
-        res.setHea;
-        der('Content-Disposition', 'attachment; filename=employee_data.csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=employee_data.csv');
         res.send(csv);
     }
     async exportExcel(res) {

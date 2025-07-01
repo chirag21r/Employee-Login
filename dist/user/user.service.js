@@ -16,11 +16,13 @@ exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const user_entity_1 = require("./user.entity");
+const user_entity_1 = require("./entity/user.entity");
 const bcrypt = require("bcrypt");
+const role_entity_1 = require("../roles/entity/role.entity");
 let UserService = class UserService {
-    constructor(userRepository) {
+    constructor(userRepository, roleRepo) {
         this.userRepository = userRepository;
+        this.roleRepo = roleRepo;
     }
     async createUser(user) {
         if (!user.password) {
@@ -44,7 +46,7 @@ let UserService = class UserService {
             relations: ['roles'],
         });
         if (!user) {
-            throw new NotFoundException('User not found');
+            throw new common_1.NotFoundException('User not found');
         }
         const roles = await this.roleRepo.findByIds(roleIds);
         user.roles = roles;
@@ -55,6 +57,8 @@ exports.UserService = UserService;
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(role_entity_1.Role)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
 ], UserService);
 //# sourceMappingURL=user.service.js.map
