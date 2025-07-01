@@ -12,4 +12,4 @@ import { Role } from 'src/roles/entity/role.entity';
   providers: [UserService],
   exports: [UserService],
 })
-export class UserModule {}
+export class UsersModule {}

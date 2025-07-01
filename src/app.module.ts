@@ -6,40 +6,36 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { AuthModule } from './auth/auth.module';
 import { LogsModule } from './logs/logs.module';
-
-// ✅ New Modules (to be created)
-import { UsersModule } from './users/users.module';
-import { EmployeeProfilesModule } from './employee-profiles/employee-profiles.module';
-import { RolesModule } from './roles/roles.module';
+import { UsersModule } from './user/user.module';
+import { EmployeeProfilesModule } from './employee-profile/employee-profile.module';
+import { RolesModule } from './roles/role.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { SessionsModule } from './sessions/sessions.module';
 
-// ✅ Updated Entities
-import { User } from './users/entities/user.entity';
+// Entities
+import { User } from './user/entity/user.entity';
 import { Log } from './logs/log.entity';
-import { EmployeeProfile } from './employee-profiles/entities/employee-profile.entity';
-import { Role } from './roles/entities/role.entity';
-import { AuditLog } from './audit-logs/entities/audit-log.entity';
-import { UserSession } from './sessions/entities/user-session.entity';
+import { EmployeeProfile } from './employee-profile/entity/employee-profile.entity';
+import { Role } from './roles/entity/role.entity';
+import { AuditLog } from './audit-logs/entity/audit-log.entity';
+import { UserSession } from './sessions/entity/user-session.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
 
     ScheduleModule.forRoot(),
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: (cs: ConfigService) => ({
         type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: configService.get<number>('DB_PORT') ?? 5432,
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_NAME'),
+        host: cs.get('DB_HOST'),
+        port: cs.get<number>('DB_PORT') ?? 5432,
+        username: cs.get('DB_USERNAME'),
+        password: cs.get('DB_PASSWORD'),
+        database: cs.get('DB_NAME'),
         entities: [
           User,
           Log,
@@ -48,11 +44,10 @@ import { UserSession } from './sessions/entities/user-session.entity';
           AuditLog,
           UserSession,
         ],
-        synchronize: true, // ❗ Disable in production
+        synchronize: true, // disable in prod
       }),
     }),
 
-    // ✅ Feature Modules
     AuthModule,
     LogsModule,
     UsersModule,

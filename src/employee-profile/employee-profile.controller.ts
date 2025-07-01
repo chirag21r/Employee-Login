@@ -10,7 +10,6 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { EmployeeProfileService } from './employee-profile.service';
 import { CreateEmployeeProfileDto } from './dto/create-profile.dto';
 import { UpdateEmployeeProfileDto } from './dto/update-profile.dto';
@@ -19,7 +18,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../common/constants/roles.enum';
 import { Response } from 'express';
-import { Res } from '@nestjs/common';
+import { AuthenticatedRequest } from 'src/types/express-request.interface';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('api/employees')
@@ -49,7 +48,7 @@ export class EmployeeProfileController {
 async exportCSV(@Res() res: Response) {
   const csv = await this.service.exportAsCSV();
   res.setHeader('Content-Type', 'text/csv');
-  res.setHea der('Content-Disposition', 'attachment; filename=employee_data.csv');
+  res.setHeader('Content-Disposition', 'attachment; filename=employee_data.csv');
   res.send(csv);
 }
 
@@ -67,21 +66,21 @@ async exportExcel(@Res() res: Response) {
   update(
     @Param('id') id: string,
     @Body() dto: UpdateEmployeeProfileDto,
-    @Req() req: Request
+    @Req() req: AuthenticatedRequest
   ) {
     return this.service.update(id, dto, {
-      userId: req.user?.id,
-      ip: req.ip,
+      userId: req.user?.id!,
+      ip: req.ip!,
       userAgent: req.headers['user-agent'] || '',
     });
   }
 
   @Delete(':id')
   @Roles(UserRole.SUPER_ADMIN)
-  remove(@Param('id') id: string, @Req() req: Request) {
+  remove(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     return this.service.remove(id, {
-      userId: req.user?.id,
-      ip: req.ip,
+      userId: req.user?.id!,
+      ip: req.ip!,
       userAgent: req.headers['user-agent'] || '',
     });
   }

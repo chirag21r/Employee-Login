@@ -7,32 +7,32 @@ import {
   
   export class CreateAuditLogDto {
     @IsUUID()
-    userId: string;
+    userId!: string;
   
     @IsString()
-    action: string;
+    action!: string;
   
     @IsString()
-    resourceType: string;
+    resourceType!: string;
   
     @IsUUID()
     @IsOptional()
-    resourceId?: string;
+    resourceId!: string;
   
     @IsObject()
     @IsOptional()
-    oldValues?: object;
+    oldValues!: object;
   
     @IsObject()
     @IsOptional()
-    newValues?: object;
+    newValues!: object;
   
     @IsString()
     @IsOptional()
-    ipAddress?: string;
+    ipAddress!: string;
   
     @IsString()
     @IsOptional()
-    userAgent?: string;
+    userAgent!: string;
   }
   

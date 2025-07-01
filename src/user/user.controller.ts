@@ -4,6 +4,9 @@ import {
   Body,
   BadRequestException,
   ConflictException,
+  Put,
+  UseGuards,
+  Param,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { LogsService } from '../logs/log.service';
