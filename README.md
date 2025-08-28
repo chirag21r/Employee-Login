@@ -2,14 +2,14 @@
 
 A robust, secure, and extensible employee management backend system built with **NestJS**, **TypeORM**, and **PostgreSQL**, featuring:
 
-- 🔐 Role-Based Access Control (RBAC)
-- 📄 Audit Logs for tracking changes
-- 📤 CSV/Excel export of employee data
-- 📚 Clean architecture and modular design
+-  Role-Based Access Control (RBAC)
+-  Audit Logs for tracking changes
+-  CSV/Excel export of employee data
+-  Clean architecture and modular design
 
 ---
 
-## 🚀 Project Overview
+##  Project Overview
 
 This system handles employee records, roles, and access control in an organization securely. Users authenticate via email & password and are assigned one or more roles, which determine their permissions across the system.
 
@@ -22,7 +22,7 @@ This system handles employee records, roles, and access control in an organizati
 
 ---
 
-## 🧠 System Architecture
+##  System Architecture
 
 ```mermaid
 graph TD
@@ -39,19 +39,19 @@ graph TD
 
 ---
 
-## 🧾 Key Features
+##  Key Features
 
-- ✅ **Authentication:** JWT-based login
-- ✅ **User Signup with Validation**
-- ✅ **RBAC:** Super Admin, HR Admin, Manager, Employee
-- ✅ **Audit Logs:** Update/Delete tracking with metadata
-- ✅ **Data Export:** Employee data as CSV or Excel
-- ✅ **Soft Deletion** of profiles
-- ✅ **Clean Modular Design**
+-  **Authentication:** JWT-based login
+-  **User Signup with Validation**
+-  **RBAC:** Super Admin, HR Admin, Manager, Employee
+-  **Audit Logs:** Update/Delete tracking with metadata
+-  **Data Export:** Employee data as CSV or Excel
+-  **Soft Deletion** of profiles
+-  **Clean Modular Design**
 
 ---
 
-## 👥 Roles & Permissions
+##  Roles & Permissions
 
 | Feature / Endpoint                  | SUPER_ADMIN | HR_ADMIN | MANAGER | EMPLOYEE |
 |------------------------------------|-------------|----------|---------|----------|
@@ -67,7 +67,7 @@ graph TD
 
 ---
 
-## 🔐 Authentication API
+##  Authentication API
 
 | Method | Endpoint            | Description               | Auth | Role |
 |--------|---------------------|---------------------------|------|------|
@@ -75,7 +75,7 @@ graph TD
 
 ---
 
-## 👤 User API
+##  User API
 
 | Method | Endpoint              | Description                  | Auth | Role          |
 |--------|-----------------------|------------------------------|------|---------------|
@@ -84,7 +84,7 @@ graph TD
 
 ---
 
-## 🧑‍💼 Employee API
+##  Employee API
 
 | Method | Endpoint                       | Description                        | Auth | Role                          |
 |--------|--------------------------------|------------------------------------|------|-------------------------------|
@@ -96,7 +96,7 @@ graph TD
 
 ---
 
-## 📤 Export API
+##  Export API
 
 | Method | Endpoint                           | Description                    | Auth | Role                    |
 |--------|------------------------------------|--------------------------------|------|--------------------------|
@@ -105,7 +105,7 @@ graph TD
 
 ---
 
-## 📚 Audit Logs API
+##  Audit Logs API
 
 | Method | Endpoint               | Description                | Auth | Role        |
 |--------|------------------------|----------------------------|------|-------------|
@@ -113,7 +113,7 @@ graph TD
 
 ---
 
-## 📦 How This System Is Useful
+##  How This System Is Useful
 
 - ✅ **For Organizations:** Helps manage employees, track access, and ensure secure operations.
 - ✅ **For Admins:** Full control over users and changes via audit logs.
@@ -122,7 +122,7 @@ graph TD
 
 ---
 
-## ✅ Getting Started
+##  Getting Started
 
 1. **Install dependencies**
    ```bash
