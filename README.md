@@ -22,20 +22,6 @@ This system handles employee records, roles, and access control in an organizati
 
 ---
 
-##  System Architecture
-
-```mermaid
-graph TD
-  A[User] -->|Login| B(Auth Module)
-  B --> C{JWT Token}
-  A -->|API Request + Token| D[Guards + Interceptors]
-  D -->|Check Role| E[Employee Profile Module]
-  D -->|Log Action| F[Audit Log Module]
-  D -->|Assign Role| G[User Module]
-  E --> H[(PostgreSQL Database)]
-  F --> H
-  G --> H
-```
 
 ---
 
